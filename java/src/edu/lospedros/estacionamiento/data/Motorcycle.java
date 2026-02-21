@@ -1,4 +1,8 @@
 package edu.lospedros.estacionamiento.data;
 
-public class Motorcycle {
+public class Motorcycle extends Vehicle{
+    public Motorcycle(String licensePlate) {
+        super(licensePlate, VehicleSize.SMALL);
+    }
+
 }
