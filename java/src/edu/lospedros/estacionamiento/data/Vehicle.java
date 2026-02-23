@@ -1,19 +1,19 @@
 package edu.lospedros.estacionamiento.data;
 
-public class Vehicle {
-    protected String licencePlate;
+public abstract class Vehicle {
+    protected String licensePlate;
     protected VehicleSize size;
 
-    public Vehicle(String licencePlate, VehicleSize size) {
-        this.licencePlate = licencePlate;
+    public Vehicle(String licensePlate, VehicleSize size) {
+        this.licensePlate = licensePlate;
         this.size = size;
     }
 
-    public String getLicencePlate() {
-        return licencePlate;
+    public String getLicensePlate() {
+        return licensePlate;
     }
 
-    public String getSize() {
-        return getSize();
+    public VehicleSize getSize() {
+        return size;
     }
 }
