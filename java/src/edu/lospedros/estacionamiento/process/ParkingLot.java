@@ -2,15 +2,15 @@ package edu.lospedros.estacionamiento.process;
 
 import edu.lospedros.estacionamiento.data.Ticket;
 import edu.lospedros.estacionamiento.data.Vehicle;
-import edu.lospedros.estacionamiento.payment.FareCalculator;
+
 import java.time.LocalDateTime;
 
 public class ParkingLot {
     private ParkingManager parkingManager;
-    private FareCalculator fareCalculator;
+    private TarifaCalculator fareCalculator;
 
 
-    public ParkingLot(ParkingManager parkingManager, FareCalculator fareCalculator) {
+    public ParkingLot(ParkingManager parkingManager, TarifaCalculator fareCalculator) {
         this.parkingManager = parkingManager;
         this.fareCalculator = fareCalculator;
     }
