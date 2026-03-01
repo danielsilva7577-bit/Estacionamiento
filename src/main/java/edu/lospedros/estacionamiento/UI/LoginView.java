@@ -52,6 +52,8 @@ public class LoginView {
         leftPanel.setStyle("-fx-background-color: #fff3e6; -fx-border-color: #fed7aa; -fx-border-width: 0 1 0 0;");
 
         Label systemName = new Label(LanguageManager.get("login.system.name"));
+        systemName.setWrapText(true);
+        systemName.setMaxWidth(Double.MAX_VALUE);
         systemName.setStyle("-fx-font-size: 34px; -fx-font-weight: 800; -fx-text-fill: #9a3412;");
         Label engine = new Label(LanguageManager.get("login.system.subtitle"));
         engine.setStyle("-fx-font-size: 14px; -fx-font-weight: 700; -fx-text-fill: #c2410c;");
@@ -77,11 +79,15 @@ public class LoginView {
         Label subtitle = new Label(LanguageManager.get("login.subtitle"));
         subtitle.setStyle("-fx-font-size: 12px; -fx-text-fill: #c2410c;");
 
+        Label lblEmail = new Label(LanguageManager.get("login.email.label"));
+        lblEmail.setStyle("-fx-font-size: 12px; -fx-font-weight: 700; -fx-text-fill: #9a3412;");
         TextField txtEmail = new TextField();
         txtEmail.setPromptText(LanguageManager.get("login.email.prompt"));
         txtEmail.setMaxWidth(360);
         txtEmail.setStyle("-fx-background-color: #fff7ed; -fx-text-fill: #7c2d12; -fx-prompt-text-fill: #b45309; -fx-border-color: #fdba74;");
 
+        Label lblPassword = new Label(LanguageManager.get("login.password.label"));
+        lblPassword.setStyle("-fx-font-size: 12px; -fx-font-weight: 700; -fx-text-fill: #9a3412;");
         PasswordField txtPassword = new PasswordField();
         txtPassword.setPromptText(LanguageManager.get("login.password.prompt"));
         txtPassword.setMaxWidth(360);
@@ -120,15 +126,31 @@ public class LoginView {
         Button btnRegister = new Button(LanguageManager.get("login.btn.register"));
         btnRegister.setStyle(guestBase);
         btnRegister.setMinWidth(170);
+        btnRegister.setMaxWidth(360);
         btnRegister.setCursor(Cursor.HAND);
         btnRegister.setOnMouseEntered(e -> btnRegister.setStyle(guestHover));
         btnRegister.setOnMouseExited(e -> btnRegister.setStyle(guestBase));
         btnRegister.setOnAction(e -> registerUser(stage, authService));
 
-        HBox actions = new HBox(10, btnLogin, btnGuest);
-        actions.setAlignment(Pos.CENTER_LEFT);
+        btnLogin.setMaxWidth(360);
+        btnGuest.setMaxWidth(360);
 
-        rightPanel.getChildren().addAll(title, subtitle, txtEmail, txtPassword, actions, btnRegister, error);
+        VBox actions = new VBox(10, btnLogin, btnGuest, btnRegister);
+        actions.setAlignment(Pos.CENTER_LEFT);
+        Region actionSpacer = new Region();
+        VBox.setVgrow(actionSpacer, Priority.ALWAYS);
+
+        rightPanel.getChildren().addAll(
+                title,
+                subtitle,
+                lblEmail,
+                txtEmail,
+                lblPassword,
+                txtPassword,
+                actionSpacer,
+                actions,
+                error
+        );
 
         root.setLeft(leftPanel);
         root.setCenter(rightPanel);
