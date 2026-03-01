@@ -3,6 +3,12 @@ package edu.lospedros.estacionamiento.persistence;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
+/**
+ * DTO para persistir el registro histórico de una salida.
+ * <p>
+ * Almacena los detalles de la transacción finalizada, incluyendo tiempos y montos.
+ * </p>
+ */
 public class ParkingExitRecord {
     private String ticketId;
     private int spaceId;

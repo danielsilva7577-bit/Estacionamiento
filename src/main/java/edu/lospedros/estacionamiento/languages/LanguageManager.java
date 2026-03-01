@@ -1,9 +1,15 @@
-package edu.lospedros.estacionamiento.languages; // <--- Mira si tu carpeta termina en 's' o no
+package edu.lospedros.estacionamiento.languages;
 
 import java.util.Locale;
 import java.util.ResourceBundle;
 
-public class LanguageManager { // <--- Nombre con 'e'
+/**
+ * Gestor de internacionalización (i18n) para la aplicación.
+ * <p>
+ * Carga y proporciona cadenas de texto localizadas desde archivos de propiedades.
+ * </p>
+ */
+public class LanguageManager {
     private static ResourceBundle bundle;
     private static Locale currentLocale;
 
@@ -12,6 +18,11 @@ public class LanguageManager { // <--- Nombre con 'e'
         setLocale("es");
     }
 
+    /**
+     * Cambia el idioma actual de la aplicación.
+     *
+     * @param lang Código del idioma (e.g., "es", "en").
+     */
     public static void setLocale(String lang) {
         try {
             currentLocale = new Locale(lang);
@@ -24,6 +35,12 @@ public class LanguageManager { // <--- Nombre con 'e'
         }
     }
 
+    /**
+     * Obtiene una cadena localizada por su clave.
+     *
+     * @param key La clave del mensaje en el archivo de propiedades.
+     * @return El texto localizado, o la clave entre signos de exclamación si no se encuentra.
+     */
     public static String get(String key) {
         try {
             return bundle.getString(key);

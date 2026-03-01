@@ -13,9 +13,21 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Properties;
 
+/**
+ * Implementación de {@link ParkingStateRepository} que utiliza un formato similar a JSON
+ * (basado en Properties) para persistir el estado del estacionamiento.
+ * <p>
+ * Guarda tanto los tickets activos como el historial de salidas.
+ * </p>
+ */
 public class JsonParkingStateRepository implements ParkingStateRepository {
     private final Path filePath;
 
+    /**
+     * Crea un repositorio de estado.
+     *
+     * @param filePath Ruta del archivo de persistencia.
+     */
     public JsonParkingStateRepository(Path filePath) {
         this.filePath = Objects.requireNonNull(filePath, "filePath");
     }

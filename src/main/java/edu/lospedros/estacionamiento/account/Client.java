@@ -10,9 +10,21 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
+/**
+ * Representa una cuenta de cliente regular.
+ * <p>
+ * Los clientes pueden registrar múltiples vehículos y tener métodos de pago preferidos.
+ * </p>
+ */
 public class Client extends Account {
+    /**
+     * Número máximo de vehículos permitidos por cliente.
+     */
     public static final int MAX_VEHICLES = 3;
 
+    /**
+     * Perfil inmutable de un vehículo asociado a un cliente.
+     */
     public static final class VehicleProfile {
         private final String vehicleType;
         private final String vehicleBrand;
@@ -52,10 +64,29 @@ public class Client extends Account {
     private final List<VehicleProfile> vehicles = new ArrayList<>();
     private String preferredPaymentMethod = "";
 
+    /**
+     * Crea un cliente sin vehículos iniciales.
+     *
+     * @param id           Identificador único.
+     * @param email        Correo electrónico.
+     * @param passwordHash Hash de la contraseña.
+     */
     public Client(String id, String email, String passwordHash) {
         super(id, email, passwordHash);
     }
 
+    /**
+     * Crea un cliente con un vehículo inicial.
+     *
+     * @param id           Identificador único.
+     * @param email        Correo electrónico.
+     * @param passwordHash Hash de la contraseña.
+     * @param vehicleType  Tipo de vehículo.
+     * @param vehicleBrand Marca del vehículo.
+     * @param vehicleModel Modelo del vehículo.
+     * @param vehicleColor Color del vehículo.
+     * @param vehiclePlate Placa del vehículo.
+     */
     public Client(String id, String email, String passwordHash, String vehicleType, String vehicleBrand, String vehicleModel, String vehicleColor, String vehiclePlate) {
         super(id, email, passwordHash);
         addVehicle(vehicleType, vehicleBrand, vehicleModel, vehicleColor, vehiclePlate);
@@ -68,6 +99,11 @@ public class Client extends Account {
 
     public double saldoCredito;
 
+    /**
+     * Registra un vehículo en la cuenta del cliente.
+     *
+     * @param v El vehículo a registrar.
+     */
     public void registrarVehiculo(Vehicle v) {
         if (v == null) return;
         String type = (v instanceof LargeVehicle) ? "TRUCK" : (v instanceof StandardVehicle ? "CAR" : "MOTORCYCLE");
@@ -76,6 +112,11 @@ public class Client extends Account {
         addVehicle(type, v.getMarca(), "N/A", "N/A", plate);
     }
 
+    /**
+     * Configura el método de pago preferido del cliente.
+     *
+     * @param p El procesador de pago.
+     */
     public void configurarPago(PaymentProcessor p) {
         if (p == null) {
             preferredPaymentMethod = "";
@@ -84,10 +125,25 @@ public class Client extends Account {
         preferredPaymentMethod = p.nombreMetodo();
     }
 
+    /**
+     * Obtiene la lista de vehículos registrados.
+     *
+     * @return Una copia de la lista de perfiles de vehículos.
+     */
     public List<VehicleProfile> getVehicles() {
         return new ArrayList<>(vehicles);
     }
 
+    /**
+     * Añade un nuevo vehículo a la cuenta.
+     *
+     * @param vehicleType  Tipo de vehículo.
+     * @param vehicleBrand Marca.
+     * @param vehicleModel Modelo.
+     * @param vehicleColor Color.
+     * @param vehiclePlate Placa.
+     * @return {@code true} si se añadió correctamente, {@code false} si se alcanzó el límite o la placa está duplicada.
+     */
     public boolean addVehicle(String vehicleType, String vehicleBrand, String vehicleModel, String vehicleColor, String vehiclePlate) {
         if (vehicles.size() >= MAX_VEHICLES) return false;
         VehicleProfile profile = new VehicleProfile(vehicleType, vehicleBrand, vehicleModel, vehicleColor, vehiclePlate);
@@ -99,6 +155,9 @@ public class Client extends Account {
         return true;
     }
 
+    /**
+     * Elimina todos los vehículos registrados.
+     */
     public void clearVehicles() {
         vehicles.clear();
     }

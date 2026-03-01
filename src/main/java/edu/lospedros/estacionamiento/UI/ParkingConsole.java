@@ -76,6 +76,14 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
+/**
+ * Consola principal de gestión del estacionamiento.
+ * <p>
+ * Esta clase maneja la interfaz gráfica principal donde los usuarios (administradores,
+ * clientes e invitados) interactúan con el sistema. Permite visualizar el estado
+ * de los espacios, registrar entradas y salidas, y gestionar usuarios (para administradores).
+ * </p>
+ */
 public class ParkingConsole {
     private enum VehicleCategory {
         CAR("tab.cars", "vehicle.car"),
@@ -174,12 +182,24 @@ public class ParkingConsole {
     private boolean adminViewActive;
     private Ticket currentGuestTicket;
 
+    /**
+     * Constructor de la consola de estacionamiento.
+     *
+     * @param session          Contexto de la sesión actual (usuario autenticado).
+     * @param cuentaRepository Repositorio para acceder a los datos de las cuentas.
+     * @param passwordHasher   Utilidad para el manejo de contraseñas (necesaria para crear nuevos usuarios).
+     */
     public ParkingConsole(SessionContext session, AccountRepository cuentaRepository, PasswordHasher passwordHasher) {
         this.session = session;
         this.cuentaRepository = cuentaRepository;
         this.passwordHasher = passwordHasher;
     }
 
+    /**
+     * Inicializa y muestra la interfaz gráfica de la consola.
+     *
+     * @param stage El escenario principal de JavaFX donde se renderizará la consola.
+     */
     public void show(Stage stage) {
         this.stage = stage;
         this.sistema = ParkingSystem.crearDefault();
@@ -1344,7 +1364,7 @@ public class ParkingConsole {
         return switch (normalized) {
             case "CAR", "PROMEDIO" -> Optional.of(VehicleCategory.CAR);
             case "MOTORCYCLE", "MOTO" -> Optional.of(VehicleCategory.MOTORCYCLE);
-            case "TRUCK", "CAMIONETA" -> Optional.of(VehicleCategory.TRUCK);
+            case "TRUCK", "GRANDE" -> Optional.of(VehicleCategory.TRUCK);
             default -> Optional.empty();
         };
     }

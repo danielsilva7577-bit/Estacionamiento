@@ -5,6 +5,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Contenedor del estado completo del estacionamiento para persistencia.
+ * <p>
+ * Agrupa los tickets activos y el historial de salidas en una sola estructura.
+ * </p>
+ */
 public class ParkingState {
     private Map<Integer, ActiveTicketRecord> activeTickets = new HashMap<>();
     private List<ParkingExitRecord> exitHistory = new ArrayList<>();

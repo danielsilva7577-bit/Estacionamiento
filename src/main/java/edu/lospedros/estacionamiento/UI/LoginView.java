@@ -35,12 +35,26 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Consumer;
 
+/**
+ * Vista de inicio de sesión de la aplicación.
+ * <p>
+ * Proporciona la interfaz gráfica para que los usuarios inicien sesión,
+ * entren como invitados o se registren como nuevos clientes.
+ * </p>
+ */
 public class LoginView {
     private static final String PRIMARY_ORANGE = "#ea580c";
     private static final String PRIMARY_ORANGE_DARK = "#c2410c";
     private static final String SOFT_ORANGE = "#fed7aa";
     private static final String DIALOG_STYLE = "-fx-background-color: #fffaf5;";
 
+    /**
+     * Muestra la pantalla de inicio de sesión.
+     *
+     * @param stage           El escenario principal de JavaFX.
+     * @param authService     El servicio de autenticación para validar credenciales.
+     * @param onAuthenticated Callback que se ejecuta cuando el usuario se autentica correctamente.
+     */
     public void show(Stage stage, AuthService authService, Consumer<SessionContext> onAuthenticated) {
         BorderPane root = new BorderPane();
         root.setStyle("-fx-background-color: #fffaf5; -fx-font-family: 'Segoe UI';");

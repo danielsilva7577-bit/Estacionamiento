@@ -11,6 +11,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
+/**
+ * Sistema central de gestión del estacionamiento.
+ * <p>
+ * Coordina la interacción entre cuentas, espacios, vehículos y tickets.
+ * Es el punto de entrada para las operaciones principales de negocio.
+ * </p>
+ */
 public class ParkingSystem {
     private static final double GUEST_HOURLY_RATE = 30.0;
     private final List<Account> cuentas;
@@ -18,12 +25,27 @@ public class ParkingSystem {
     private final SpaceManager gestor;
     private final AtomicInteger folioGenerator = new AtomicInteger(1);
 
+    /**
+     * Crea una instancia del sistema de estacionamiento.
+     *
+     * @param cuentas  Lista de cuentas registradas.
+     * @param espacios Lista de espacios disponibles.
+     * @param gestor   Gestor de espacios.
+     */
     public ParkingSystem(List<Account> cuentas, List<Space> espacios, SpaceManager gestor) {
         this.cuentas = (cuentas == null) ? new ArrayList<>() : cuentas;
         this.espacios = espacios;
         this.gestor = gestor;
     }
 
+    /**
+     * Crea una configuración por defecto del sistema.
+     * <p>
+     * Inicializa los espacios con una distribución predefinida (20 motos, 30 grandes, 50 promedio).
+     * </p>
+     *
+     * @return Una nueva instancia de {@link ParkingSystem} configurada.
+     */
     public static ParkingSystem crearDefault() {
         List<Space> espacios = new ArrayList<>();
         int numero = 1;
@@ -34,6 +56,15 @@ public class ParkingSystem {
         return new ParkingSystem(new ArrayList<>(), espacios, gestor);
     }
 
+    /**
+     * Registra el ingreso de un vehículo al estacionamiento.
+     *
+     * @param c La cuenta que realiza el registro.
+     * @param e El espacio seleccionado.
+     * @param v El vehículo a estacionar.
+     * @param p El procesador de pago inicial (opcional).
+     * @return El ticket generado, o {@code null} si no se pudo registrar (espacio ocupado, tipo incorrecto, etc.).
+     */
     public Ticket registrarIngreso(Account c, Space e, Vehicle v, PaymentProcessor p) {
         if (c == null || e == null || v == null) return null;
         if (e.isOcupado()) return null;
@@ -50,6 +81,12 @@ public class ParkingSystem {
         return t;
     }
 
+    /**
+     * Registra la salida de un vehículo y procesa el cobro.
+     *
+     * @param t El ticket asociado al vehículo que sale.
+     * @return {@code true} si la salida y el cobro fueron exitosos.
+     */
     public boolean registrarSalida(Ticket t) {
         if (t == null) return false;
         Space e = gestor.obtenerEspacio(t.getEspacioNumero());

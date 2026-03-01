@@ -2,6 +2,12 @@ package edu.lospedros.estacionamiento.persistence;
 
 import java.time.LocalDateTime;
 
+/**
+ * DTO (Data Transfer Object) para persistir tickets activos.
+ * <p>
+ * Se utiliza para serializar el estado de los vehículos actualmente estacionados.
+ * </p>
+ */
 public class ActiveTicketRecord {
     private String ticketId;
     private String vehicleType;

@@ -18,11 +18,23 @@ import java.util.Locale;
 import java.util.Optional;
 import java.util.Properties;
 
+/**
+ * Implementación de {@link AccountRepository} basada en archivos de propiedades.
+ * <p>
+ * Almacena y recupera las cuentas de usuario desde un archivo local.
+ * </p>
+ */
 public class FileAccountRepository implements AccountRepository {
     private final Path filePath;
     private final PasswordHasher hasher;
     private final List<Account> accounts = new ArrayList<>();
 
+    /**
+     * Crea un repositorio basado en archivo.
+     *
+     * @param filePath Ruta del archivo donde se persistirán los datos.
+     * @param hasher   Utilidad para el manejo de contraseñas (usada en la siembra inicial).
+     */
     public FileAccountRepository(Path filePath, PasswordHasher hasher) {
         this.filePath = filePath;
         this.hasher = hasher;
