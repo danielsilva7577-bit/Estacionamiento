@@ -174,6 +174,7 @@ public class ParkingConsole {
     private ParkingSystem sistema;
     private ParkingStateRepository stateRepository;
     private final Map<Integer, Ticket> activeTickets = new HashMap<>();
+    private final Map<Integer, String> activeTicketOwners = new HashMap<>();
     private final List<ParkingExitRecord> exitHistory = new ArrayList<>();
     private final Map<String, String> ticketVehicleNotes = new HashMap<>();
     private String pendingVehicleNote;
@@ -327,6 +328,7 @@ public class ParkingConsole {
         btnLogout.setStyle(SIDEBAR_BUTTON_STYLE);
         applyHover(btnLogout, SIDEBAR_BUTTON_STYLE, SIDEBAR_BUTTON_HOVER_STYLE);
         btnLogout.setOnAction(e -> {
+            if (!confirmLogout()) return;
             AuthService authService = new AuthService(cuentaRepository, passwordHasher);
             LoginView loginView = new LoginView();
             loginView.show(stage, authService, session -> {
@@ -547,6 +549,33 @@ public class ParkingConsole {
         HBox userActions = new HBox(8, btnAddUser, btnDeleteUser);
         userActions.setAlignment(Pos.CENTER_LEFT);
 
+        Label sectionActiveReservations = new Label(LanguageManager.get("admin.active.title"));
+        sectionActiveReservations.setStyle("-fx-font-size: 16px; -fx-font-weight: 700; -fx-text-fill: #9a3412;");
+
+        ListView<String> activeReservationsList = new ListView<>();
+        activeReservationsList.setPrefHeight(180);
+
+        Runnable refreshActiveReservations = () -> {
+            activeReservationsList.getItems().clear();
+            if (activeTickets.isEmpty()) {
+                activeReservationsList.getItems().add(LanguageManager.get("admin.active.empty"));
+                return;
+            }
+            for (Map.Entry<Integer, Ticket> entry : activeTickets.entrySet()) {
+                int spaceId = entry.getKey();
+                Ticket ticket = entry.getValue();
+                String plate = ticket.getVehiculo() == null ? "-" : ticket.getVehiculo().getPlaca();
+                String owner = activeTicketOwners.getOrDefault(spaceId, LanguageManager.get("admin.active.unknown"));
+                String vehicleType = ticket.getVehiculo() == null ? "-" : ticket.getVehiculo().getTipo();
+                activeReservationsList.getItems().add(
+                        LanguageManager.get("label.space") + " #" + spaceId +
+                                " | " + LanguageManager.get("label.plate") + ": " + plate +
+                                " | " + LanguageManager.get("label.type") + ": " + vehicleType +
+                                " | " + LanguageManager.get("admin.active.user") + ": " + owner
+                );
+            }
+        };
+
         Label sectionReports = new Label(LanguageManager.get("admin.report.title"));
         sectionReports.setStyle("-fx-font-size: 16px; -fx-font-weight: 700;");
 
@@ -580,16 +609,21 @@ public class ParkingConsole {
         applyHover(btnRefresh, refreshBase, refreshHover);
         btnRefresh.setOnAction(e -> {
             refreshUsers.run();
+            refreshActiveReservations.run();
             refreshReport.run();
         });
 
         refreshUsers.run();
+        refreshActiveReservations.run();
         refreshReport.run();
 
         root.getChildren().addAll(
                 sectionUsers,
                 usersList,
                 userActions,
+                new Separator(),
+                sectionActiveReservations,
+                activeReservationsList,
                 new Separator(),
                 sectionReports,
                 lblTotalExits,
@@ -668,6 +702,7 @@ public class ParkingConsole {
         try {
             ParkingState persisted = stateRepository.load();
             activeTickets.clear();
+            activeTicketOwners.clear();
             exitHistory.clear();
             if (persisted.getExitHistory() != null) {
                 exitHistory.addAll(persisted.getExitHistory());
@@ -697,6 +732,7 @@ public class ParkingConsole {
                 espacio.setOcupado(true);
                 sistema.getGestor().contabilizarIngreso(vehiculo);
                 activeTickets.put(spaceId, ticket);
+                activeTicketOwners.put(spaceId, record.getReservedBy() == null ? "" : record.getReservedBy());
             }
         } catch (IOException ex) {
             showPersistenceError(ex);
@@ -717,6 +753,7 @@ public class ParkingConsole {
                     ticket.getId(),
                     category.persistedName(),
                     vehiculo.getPlaca(),
+                    activeTicketOwners.getOrDefault(spaceId, ""),
                     ticket.getEntryTime(),
                     ticket.getTarifaPorHoraAplicada()
             ));
@@ -735,15 +772,24 @@ public class ParkingConsole {
     private void registerEntry(int spaceId, VehicleCategory category, VBox card, Label lblStatus, Button btnAction) {
         Optional<Vehicle> vehicleResult = resolveVehicleForEntry(category);
         if (vehicleResult.isEmpty()) return;
+        Vehicle vehicle = vehicleResult.get();
+
+        if (isVehicleAlreadyReserved(vehicle.getPlaca())) {
+            showError("error.not.available.title", LanguageManager.get("error.vehicle.already.parked"));
+            return;
+        }
+
+        if (!session.isAdmin() && !confirmSpotReservation(spaceId, vehicle)) return;
 
         Space espacio = sistema.getEspacio(spaceId);
-        Ticket ticket = sistema.registrarIngreso(session.getCurrentAccount(), espacio, vehicleResult.get(), new CashPayment());
+        Ticket ticket = sistema.registrarIngreso(session.getCurrentAccount(), espacio, vehicle, new CashPayment());
         if (ticket == null) {
             showError("error.not.available.title", LanguageManager.get("error.not.available.msg") + " #" + spaceId + ".");
             return;
         }
 
         activeTickets.put(spaceId, ticket);
+        activeTicketOwners.put(spaceId, session.getCurrentAccount().getEmail());
         if (session.isGuest()) {
             currentGuestTicket = ticket;
         }
@@ -789,6 +835,7 @@ public class ParkingConsole {
         ));
 
         activeTickets.remove(spaceId);
+        activeTicketOwners.remove(spaceId);
         if (session.isGuest() && currentGuestTicket != null && currentGuestTicket.getId().equals(ticket.getId())) {
             currentGuestTicket = null;
         }
@@ -1467,6 +1514,43 @@ public class ParkingConsole {
         styleDialog(dialog.getDialogPane());
         Optional<String> result = dialog.showAndWait();
         return result.isPresent() && yes.equalsIgnoreCase(result.get());
+    }
+
+    private boolean isVehicleAlreadyReserved(String plate) {
+        if (plate == null || plate.isBlank()) return false;
+        String normalized = PlateValidator.normalize(plate);
+        for (Ticket ticket : activeTickets.values()) {
+            Vehicle v = ticket.getVehiculo();
+            if (v == null || v.getPlaca() == null) continue;
+            if (PlateValidator.normalize(v.getPlaca()).equals(normalized)) return true;
+        }
+        return false;
+    }
+
+    private boolean confirmSpotReservation(int spaceId, Vehicle vehicle) {
+        Alert confirmation = new Alert(Alert.AlertType.CONFIRMATION);
+        confirmation.initOwner(stage);
+        confirmation.setTitle(LanguageManager.get("confirm.reserve.title"));
+        confirmation.setHeaderText(LanguageManager.get("confirm.reserve.header"));
+        confirmation.setContentText(
+                LanguageManager.get("label.space") + " #" + spaceId + "\n" +
+                        LanguageManager.get("label.plate") + ": " + vehicle.getPlaca() + "\n" +
+                        LanguageManager.get("confirm.reserve.body")
+        );
+        styleDialog(confirmation.getDialogPane());
+        Optional<ButtonType> result = confirmation.showAndWait();
+        return result.isPresent() && result.get() == ButtonType.OK;
+    }
+
+    private boolean confirmLogout() {
+        Alert confirmation = new Alert(Alert.AlertType.CONFIRMATION);
+        confirmation.initOwner(stage);
+        confirmation.setTitle(LanguageManager.get("confirm.logout.title"));
+        confirmation.setHeaderText(LanguageManager.get("confirm.logout.header"));
+        confirmation.setContentText(LanguageManager.get("confirm.logout.body"));
+        styleDialog(confirmation.getDialogPane());
+        Optional<ButtonType> result = confirmation.showAndWait();
+        return result.isPresent() && result.get() == ButtonType.OK;
     }
 
     private boolean hasActiveTicket() {
