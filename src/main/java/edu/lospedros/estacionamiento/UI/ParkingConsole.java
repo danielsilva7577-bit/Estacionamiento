@@ -566,7 +566,9 @@ public class ParkingConsole {
                 Ticket ticket = entry.getValue();
                 String plate = ticket.getVehiculo() == null ? "-" : ticket.getVehiculo().getPlaca();
                 String owner = activeTicketOwners.getOrDefault(spaceId, LanguageManager.get("admin.active.unknown"));
-                String vehicleType = ticket.getVehiculo() == null ? "-" : ticket.getVehiculo().getTipo();
+                String vehicleType = ticket.getVehiculo() == null
+                        ? "-"
+                        : VehicleCategory.fromVehiculo(ticket.getVehiculo()).vehicleLabel();
                 activeReservationsList.getItems().add(
                         LanguageManager.get("label.space") + " #" + spaceId +
                                 " | " + LanguageManager.get("label.plate") + ": " + plate +
