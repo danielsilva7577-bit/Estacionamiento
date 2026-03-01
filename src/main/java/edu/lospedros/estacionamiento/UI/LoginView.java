@@ -10,7 +10,6 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.Cursor;
-import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
@@ -46,7 +45,7 @@ public class LoginView {
     private static final String PRIMARY_ORANGE = "#ea580c";
     private static final String PRIMARY_ORANGE_DARK = "#c2410c";
     private static final String SOFT_ORANGE = "#fed7aa";
-    private static final String DIALOG_STYLE = "-fx-background-color: #fffaf5;";
+    private static final String DIALOG_STYLE = "-fx-background-color: #fffaf5; -fx-background-radius: 0; -fx-border-radius: 0;";
 
     /**
      * Muestra la pantalla de inicio de sesión.
@@ -63,7 +62,7 @@ public class LoginView {
         leftPanel.setPrefWidth(360);
         leftPanel.setPadding(new Insets(36, 34, 36, 34));
         leftPanel.setAlignment(Pos.CENTER_LEFT);
-        leftPanel.setStyle("-fx-background-color: #fff3e6; -fx-border-color: #fed7aa; -fx-border-width: 0 1 0 0;");
+        leftPanel.setStyle("-fx-background-color: #fff3e6; -fx-border-color: #fed7aa; -fx-border-width: 0 1 0 0; -fx-background-radius: 0; -fx-border-radius: 0;");
 
         Label systemName = new Label(LanguageManager.get("login.system.name"));
         systemName.setWrapText(true);
@@ -85,7 +84,7 @@ public class LoginView {
         VBox rightPanel = new VBox(14);
         rightPanel.setPadding(new Insets(42));
         rightPanel.setAlignment(Pos.CENTER_LEFT);
-        rightPanel.setStyle("-fx-background-color: #ffffff;");
+        rightPanel.setStyle("-fx-background-color: #ffffff; -fx-background-radius: 0; -fx-border-radius: 0;");
 
         Label title = new Label(LanguageManager.get("login.title"));
         title.setStyle("-fx-font-size: 22px; -fx-font-weight: 800; -fx-text-fill: #9a3412;");
@@ -98,21 +97,21 @@ public class LoginView {
         TextField txtEmail = new TextField();
         txtEmail.setPromptText(LanguageManager.get("login.email.prompt"));
         txtEmail.setMaxWidth(360);
-        txtEmail.setStyle("-fx-background-color: #fff7ed; -fx-text-fill: #7c2d12; -fx-prompt-text-fill: #b45309; -fx-border-color: #fdba74;");
+        txtEmail.setStyle("-fx-background-color: #fffaf5; -fx-text-fill: #7c2d12; -fx-prompt-text-fill: #b45309; -fx-border-color: #fdba74; -fx-border-width: 0 0 1 0; -fx-background-radius: 0; -fx-border-radius: 0;");
 
         Label lblPassword = new Label(LanguageManager.get("login.password.label"));
         lblPassword.setStyle("-fx-font-size: 12px; -fx-font-weight: 700; -fx-text-fill: #9a3412;");
         PasswordField txtPassword = new PasswordField();
         txtPassword.setPromptText(LanguageManager.get("login.password.prompt"));
         txtPassword.setMaxWidth(360);
-        txtPassword.setStyle("-fx-background-color: #fff7ed; -fx-text-fill: #7c2d12; -fx-prompt-text-fill: #b45309; -fx-border-color: #fdba74;");
+        txtPassword.setStyle("-fx-background-color: #fffaf5; -fx-text-fill: #7c2d12; -fx-prompt-text-fill: #b45309; -fx-border-color: #fdba74; -fx-border-width: 0 0 1 0; -fx-background-radius: 0; -fx-border-radius: 0;");
 
         Label error = new Label();
         error.setStyle("-fx-text-fill: #dc2626; -fx-font-size: 12px; -fx-font-weight: 600;");
 
         Button btnLogin = new Button(LanguageManager.get("login.btn.login"));
-        String loginBase = "-fx-background-color: #ea580c; -fx-text-fill: white; -fx-font-weight: 800; -fx-padding: 10 16; -fx-border-width: 0;";
-        String loginHover = "-fx-background-color: #c2410c; -fx-text-fill: white; -fx-font-weight: 800; -fx-padding: 10 16; -fx-border-width: 0;";
+        String loginBase = "-fx-background-color: #ea580c; -fx-text-fill: white; -fx-font-weight: 800; -fx-padding: 10 16; -fx-border-width: 0; -fx-background-radius: 0; -fx-border-radius: 0;";
+        String loginHover = "-fx-background-color: #c2410c; -fx-text-fill: white; -fx-font-weight: 800; -fx-padding: 10 16; -fx-border-width: 0; -fx-background-radius: 0; -fx-border-radius: 0;";
         btnLogin.setStyle(loginBase);
         btnLogin.setMinWidth(170);
         btnLogin.setCursor(Cursor.HAND);
@@ -128,8 +127,8 @@ public class LoginView {
         });
 
         Button btnGuest = new Button(LanguageManager.get("login.btn.guest"));
-        String guestBase = "-fx-background-color: #fff7ed; -fx-text-fill: #c2410c; -fx-font-weight: 700; -fx-padding: 10 16; -fx-border-width: 0;";
-        String guestHover = "-fx-background-color: #fed7aa; -fx-text-fill: #9a3412; -fx-font-weight: 700; -fx-padding: 10 16; -fx-border-width: 0;";
+        String guestBase = "-fx-background-color: #fff7ed; -fx-text-fill: #c2410c; -fx-font-weight: 700; -fx-padding: 10 16; -fx-border-width: 0; -fx-background-radius: 0; -fx-border-radius: 0;";
+        String guestHover = "-fx-background-color: #fed7aa; -fx-text-fill: #9a3412; -fx-font-weight: 700; -fx-padding: 10 16; -fx-border-width: 0; -fx-background-radius: 0; -fx-border-radius: 0;";
         btnGuest.setStyle(guestBase);
         btnGuest.setMinWidth(170);
         btnGuest.setCursor(Cursor.HAND);
@@ -202,13 +201,12 @@ public class LoginView {
             if (vehicle.isEmpty()) return;
 
             if (authService.registerClient(normalizedEmail, password.get(), vehicle.get())) {
-                Alert alert = new Alert(Alert.AlertType.INFORMATION);
-                alert.initOwner(stage);
-                alert.setTitle(LanguageManager.get("login.register.success.title"));
-                alert.setHeaderText(LanguageManager.get("login.register.success.header"));
-                alert.setContentText(LanguageManager.get("login.register.success.msg"));
-                styleDialog(alert.getDialogPane());
-                alert.showAndWait();
+                UiMessageDialog.info(
+                        stage,
+                        LanguageManager.get("login.register.success.title"),
+                        LanguageManager.get("login.register.success.header"),
+                        LanguageManager.get("login.register.success.msg")
+                );
                 return;
             } else {
                 showError(stage, "error.state.title", LanguageManager.get("admin.users.duplicate"));
@@ -297,20 +295,19 @@ public class LoginView {
     }
 
     private void showError(Stage stage, String titleKey, String message) {
-        Alert error = new Alert(Alert.AlertType.ERROR);
-        error.initOwner(stage);
-        error.setTitle(LanguageManager.get(titleKey));
-        error.setHeaderText(LanguageManager.get("dialog.error.header"));
-        error.setContentText(message);
-        styleDialog(error.getDialogPane());
-        error.showAndWait();
+        UiMessageDialog.error(
+                stage,
+                LanguageManager.get(titleKey),
+                LanguageManager.get("dialog.error.header"),
+                message
+        );
     }
 
     private void styleDialog(DialogPane pane) {
         pane.setStyle(DIALOG_STYLE + " -fx-border-color: " + SOFT_ORANGE + ";");
         for (Button button : pane.lookupAll(".button").stream().filter(n -> n instanceof Button).map(n -> (Button) n).toList()) {
-            String base = "-fx-background-color: " + PRIMARY_ORANGE + "; -fx-text-fill: white; -fx-border-width: 0;";
-            String hover = "-fx-background-color: " + PRIMARY_ORANGE_DARK + "; -fx-text-fill: white; -fx-border-width: 0;";
+            String base = "-fx-background-color: " + PRIMARY_ORANGE + "; -fx-text-fill: white; -fx-border-width: 0; -fx-background-radius: 0; -fx-border-radius: 0;";
+            String hover = "-fx-background-color: " + PRIMARY_ORANGE_DARK + "; -fx-text-fill: white; -fx-border-width: 0; -fx-background-radius: 0; -fx-border-radius: 0;";
             button.setStyle(base);
             button.setCursor(Cursor.HAND);
             button.setOnMouseEntered(e -> button.setStyle(hover));

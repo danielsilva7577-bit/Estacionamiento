@@ -34,7 +34,6 @@ import edu.lospedros.estacionamiento.validation.PlateValidator;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
-import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
@@ -152,18 +151,18 @@ public class ParkingConsole {
     private static final String ORANGE_LIGHT = "#fed7aa";
     private static final String TEXT_DARK = "#7c2d12";
     private static final String SOFT_ORANGE = "#fed7aa";
-    private static final String CARD_FREE_STYLE = "-fx-background-color: #ffffff; -fx-border-color: #fdba74; -fx-border-width: 1;";
-    private static final String CARD_OCCUPIED_STYLE = "-fx-background-color: #fff7ed; -fx-border-color: #fb923c; -fx-border-width: 1;";
+    private static final String CARD_FREE_STYLE = "-fx-background-color: #ffffff; -fx-border-color: #fdba74; -fx-border-width: 1; -fx-background-radius: 0; -fx-border-radius: 0;";
+    private static final String CARD_OCCUPIED_STYLE = "-fx-background-color: #fff7ed; -fx-border-color: #fb923c; -fx-border-width: 1; -fx-background-radius: 0; -fx-border-radius: 0;";
     private static final String STATUS_FREE_STYLE = "-fx-text-fill: #16a34a; -fx-font-size: 12px; -fx-font-weight: 600;";
     private static final String STATUS_OCCUPIED_STYLE = "-fx-text-fill: #ea580c; -fx-font-size: 12px; -fx-font-weight: 600;";
-    private static final String ACTION_REGISTER_STYLE = "-fx-background-color: " + PRIMARY_ORANGE + "; -fx-text-fill: #ffffff; -fx-font-size: 12px; -fx-font-weight: 600; -fx-border-width: 0;";
-    private static final String ACTION_REGISTER_HOVER_STYLE = "-fx-background-color: " + PRIMARY_ORANGE_DARK + "; -fx-text-fill: #ffffff; -fx-font-size: 12px; -fx-font-weight: 600; -fx-border-width: 0;";
-    private static final String ACTION_EXIT_STYLE = "-fx-background-color: #fff7ed; -fx-text-fill: " + PRIMARY_ORANGE + "; -fx-font-size: 12px; -fx-font-weight: 600; -fx-border-width: 0;";
-    private static final String ACTION_EXIT_HOVER_STYLE = "-fx-background-color: " + ORANGE_LIGHT + "; -fx-text-fill: " + PRIMARY_ORANGE_DARK + "; -fx-font-size: 12px; -fx-font-weight: 600; -fx-border-width: 0;";
-    private static final String SIDEBAR_BUTTON_STYLE = "-fx-background-color: transparent; -fx-text-fill: " + TEXT_DARK + "; -fx-alignment: CENTER_LEFT; -fx-padding: 10 12; -fx-font-size: 13px; -fx-font-weight: 600; -fx-border-width: 0;";
-    private static final String SIDEBAR_BUTTON_HOVER_STYLE = "-fx-background-color: " + ORANGE_LIGHT + "; -fx-text-fill: " + TEXT_DARK + "; -fx-alignment: CENTER_LEFT; -fx-padding: 10 12; -fx-font-size: 13px; -fx-font-weight: 600; -fx-border-width: 0;";
-    private static final String SIDEBAR_BUTTON_ACTIVE_STYLE = "-fx-background-color: " + PRIMARY_ORANGE + "; -fx-text-fill: #ffffff; -fx-alignment: CENTER_LEFT; -fx-padding: 10 12; -fx-font-size: 13px; -fx-font-weight: 600; -fx-border-width: 0;";
-    private static final String DIALOG_STYLE = "-fx-background-color: #fffaf5;";
+    private static final String ACTION_REGISTER_STYLE = "-fx-background-color: " + PRIMARY_ORANGE + "; -fx-text-fill: #ffffff; -fx-font-size: 12px; -fx-font-weight: 600; -fx-border-width: 0; -fx-background-radius: 0; -fx-border-radius: 0;";
+    private static final String ACTION_REGISTER_HOVER_STYLE = "-fx-background-color: " + PRIMARY_ORANGE_DARK + "; -fx-text-fill: #ffffff; -fx-font-size: 12px; -fx-font-weight: 600; -fx-border-width: 0; -fx-background-radius: 0; -fx-border-radius: 0;";
+    private static final String ACTION_EXIT_STYLE = "-fx-background-color: #fff7ed; -fx-text-fill: " + PRIMARY_ORANGE + "; -fx-font-size: 12px; -fx-font-weight: 600; -fx-border-width: 0; -fx-background-radius: 0; -fx-border-radius: 0;";
+    private static final String ACTION_EXIT_HOVER_STYLE = "-fx-background-color: " + ORANGE_LIGHT + "; -fx-text-fill: " + PRIMARY_ORANGE_DARK + "; -fx-font-size: 12px; -fx-font-weight: 600; -fx-border-width: 0; -fx-background-radius: 0; -fx-border-radius: 0;";
+    private static final String SIDEBAR_BUTTON_STYLE = "-fx-background-color: transparent; -fx-text-fill: " + TEXT_DARK + "; -fx-alignment: CENTER_LEFT; -fx-padding: 10 12; -fx-font-size: 13px; -fx-font-weight: 600; -fx-border-width: 0; -fx-background-radius: 0; -fx-border-radius: 0;";
+    private static final String SIDEBAR_BUTTON_HOVER_STYLE = "-fx-background-color: " + ORANGE_LIGHT + "; -fx-text-fill: " + TEXT_DARK + "; -fx-alignment: CENTER_LEFT; -fx-padding: 10 12; -fx-font-size: 13px; -fx-font-weight: 600; -fx-border-width: 0; -fx-background-radius: 0; -fx-border-radius: 0;";
+    private static final String SIDEBAR_BUTTON_ACTIVE_STYLE = "-fx-background-color: " + PRIMARY_ORANGE + "; -fx-text-fill: #ffffff; -fx-alignment: CENTER_LEFT; -fx-padding: 10 12; -fx-font-size: 13px; -fx-font-weight: 600; -fx-border-width: 0; -fx-background-radius: 0; -fx-border-radius: 0;";
+    private static final String DIALOG_STYLE = "-fx-background-color: #fffaf5; -fx-background-radius: 0; -fx-border-radius: 0;";
 
     private final SessionContext session;
     private final AccountRepository cuentaRepository;
@@ -307,8 +306,8 @@ public class ParkingConsole {
         HBox lang = new HBox(8);
         Button btnEs = new Button("ES");
         Button btnEn = new Button("EN");
-        String langBase = "-fx-background-color: #fff7ed; -fx-text-fill: " + TEXT_DARK + "; -fx-border-width: 0;";
-        String langHover = "-fx-background-color: " + ORANGE_LIGHT + "; -fx-text-fill: " + PRIMARY_ORANGE_DARK + "; -fx-border-width: 0;";
+        String langBase = "-fx-background-color: #fff7ed; -fx-text-fill: " + TEXT_DARK + "; -fx-border-width: 0; -fx-background-radius: 0; -fx-border-radius: 0;";
+        String langHover = "-fx-background-color: " + ORANGE_LIGHT + "; -fx-text-fill: " + PRIMARY_ORANGE_DARK + "; -fx-border-width: 0; -fx-background-radius: 0; -fx-border-radius: 0;";
         btnEs.setStyle(langBase);
         btnEn.setStyle(langBase);
         applyHover(btnEs, langBase, langHover);
@@ -605,8 +604,8 @@ public class ParkingConsole {
         };
 
         Button btnRefresh = new Button(LanguageManager.get("admin.refresh"));
-        String refreshBase = "-fx-background-color: #fff7ed; -fx-text-fill: #9a3412; -fx-border-width: 0;";
-        String refreshHover = "-fx-background-color: " + ORANGE_LIGHT + "; -fx-text-fill: " + PRIMARY_ORANGE_DARK + "; -fx-border-width: 0;";
+        String refreshBase = "-fx-background-color: #fff7ed; -fx-text-fill: #9a3412; -fx-border-width: 0; -fx-background-radius: 0; -fx-border-radius: 0;";
+        String refreshHover = "-fx-background-color: " + ORANGE_LIGHT + "; -fx-text-fill: " + PRIMARY_ORANGE_DARK + "; -fx-border-width: 0; -fx-background-radius: 0; -fx-border-radius: 0;";
         btnRefresh.setStyle(refreshBase);
         applyHover(btnRefresh, refreshBase, refreshHover);
         btnRefresh.setOnAction(e -> {
@@ -850,19 +849,16 @@ public class ParkingConsole {
         long hours = minutes / 60;
         long remainingMinutes = minutes % 60;
 
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.initOwner(stage);
-        alert.setTitle(LanguageManager.get("alert.exit.title"));
-        alert.setHeaderText(LanguageManager.get("alert.exit.header"));
-        alert.setContentText(
+        UiMessageDialog.info(
+                stage,
+                LanguageManager.get("alert.exit.title"),
+                LanguageManager.get("alert.exit.header"),
                 LanguageManager.get("receipt.plate") + ": " + ticket.getVehiculo().getPlaca() + "\n" +
-                LanguageManager.get("receipt.time") + ": " + hours + "h " + remainingMinutes + "m\n" +
-                LanguageManager.get("receipt.total") + ": $" + total + "\n" +
-                LanguageManager.get("receipt.payment") + ": " + paymentProcessor.nombreMetodo() +
-                buildGuestTicketNote(ticket.getId())
+                        LanguageManager.get("receipt.time") + ": " + hours + "h " + remainingMinutes + "m\n" +
+                        LanguageManager.get("receipt.total") + ": $" + total + "\n" +
+                        LanguageManager.get("receipt.payment") + ": " + paymentProcessor.nombreMetodo() +
+                        buildGuestTicketNote(ticket.getId())
         );
-        styleDialog(alert.getDialogPane());
-        alert.showAndWait();
         ticketVehicleNotes.remove(ticket.getId());
     }
 
@@ -1140,30 +1136,28 @@ public class ParkingConsole {
     }
 
     private void showError(String titleKey, String message) {
-        Alert error = new Alert(Alert.AlertType.ERROR);
-        error.initOwner(stage);
-        error.setTitle(LanguageManager.get(titleKey));
-        error.setHeaderText(LanguageManager.get("dialog.error.header"));
-        error.setContentText(message);
-        styleDialog(error.getDialogPane());
-        error.showAndWait();
+        UiMessageDialog.error(
+                stage,
+                LanguageManager.get(titleKey),
+                LanguageManager.get("dialog.error.header"),
+                message
+        );
     }
 
     private void showPersistenceError(IOException ex) {
-        Alert warning = new Alert(Alert.AlertType.WARNING);
-        warning.initOwner(stage);
-        warning.setTitle(LanguageManager.get("error.persistence.title"));
-        warning.setHeaderText(LanguageManager.get("dialog.warning.header"));
-        warning.setContentText(LanguageManager.get("error.persistence.msg") + "\n" + ex.getMessage());
-        styleDialog(warning.getDialogPane());
-        warning.showAndWait();
+        UiMessageDialog.warning(
+                stage,
+                LanguageManager.get("error.persistence.title"),
+                LanguageManager.get("dialog.warning.header"),
+                LanguageManager.get("error.persistence.msg") + "\n" + ex.getMessage()
+        );
     }
 
     private void styleDialog(DialogPane pane) {
         pane.setStyle(DIALOG_STYLE + " -fx-border-color: " + SOFT_ORANGE + ";");
         for (Button button : pane.lookupAll(".button").stream().filter(n -> n instanceof Button).map(n -> (Button) n).toList()) {
-            String base = "-fx-background-color: " + PRIMARY_ORANGE + "; -fx-text-fill: white; -fx-border-width: 0;";
-            String hover = "-fx-background-color: " + PRIMARY_ORANGE_DARK + "; -fx-text-fill: white; -fx-border-width: 0;";
+            String base = "-fx-background-color: " + PRIMARY_ORANGE + "; -fx-text-fill: white; -fx-border-width: 0; -fx-background-radius: 0; -fx-border-radius: 0;";
+            String hover = "-fx-background-color: " + PRIMARY_ORANGE_DARK + "; -fx-text-fill: white; -fx-border-width: 0; -fx-background-radius: 0; -fx-border-radius: 0;";
             button.setStyle(base);
             applyHover(button, base, hover);
         }
@@ -1185,7 +1179,7 @@ public class ParkingConsole {
 
         VBox badge = new VBox(2, valueLabel, textLabel);
         badge.setPadding(new Insets(8, 12, 8, 12));
-        badge.setStyle("-fx-background-color: " + bgColor + "; -fx-border-color: #fed7aa; -fx-border-width: 1;");
+        badge.setStyle("-fx-background-color: " + bgColor + "; -fx-border-color: #fed7aa; -fx-border-width: 1; -fx-background-radius: 0; -fx-border-radius: 0;");
         return badge;
     }
 
@@ -1530,29 +1524,23 @@ public class ParkingConsole {
     }
 
     private boolean confirmSpotReservation(int spaceId, Vehicle vehicle) {
-        Alert confirmation = new Alert(Alert.AlertType.CONFIRMATION);
-        confirmation.initOwner(stage);
-        confirmation.setTitle(LanguageManager.get("confirm.reserve.title"));
-        confirmation.setHeaderText(LanguageManager.get("confirm.reserve.header"));
-        confirmation.setContentText(
+        return UiMessageDialog.confirm(
+                stage,
+                LanguageManager.get("confirm.reserve.title"),
+                LanguageManager.get("confirm.reserve.header"),
                 LanguageManager.get("label.space") + " #" + spaceId + "\n" +
                         LanguageManager.get("label.plate") + ": " + vehicle.getPlaca() + "\n" +
                         LanguageManager.get("confirm.reserve.body")
         );
-        styleDialog(confirmation.getDialogPane());
-        Optional<ButtonType> result = confirmation.showAndWait();
-        return result.isPresent() && result.get() == ButtonType.OK;
     }
 
     private boolean confirmLogout() {
-        Alert confirmation = new Alert(Alert.AlertType.CONFIRMATION);
-        confirmation.initOwner(stage);
-        confirmation.setTitle(LanguageManager.get("confirm.logout.title"));
-        confirmation.setHeaderText(LanguageManager.get("confirm.logout.header"));
-        confirmation.setContentText(LanguageManager.get("confirm.logout.body"));
-        styleDialog(confirmation.getDialogPane());
-        Optional<ButtonType> result = confirmation.showAndWait();
-        return result.isPresent() && result.get() == ButtonType.OK;
+        return UiMessageDialog.confirm(
+                stage,
+                LanguageManager.get("confirm.logout.title"),
+                LanguageManager.get("confirm.logout.header"),
+                LanguageManager.get("confirm.logout.body")
+        );
     }
 
     private boolean hasActiveTicket() {
