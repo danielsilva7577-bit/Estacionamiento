@@ -46,6 +46,7 @@ public class JsonParkingStateRepository implements ParkingStateRepository {
                     props.getProperty(prefix + "ticketId"),
                     props.getProperty(prefix + "vehicleType"),
                     props.getProperty(prefix + "licensePlate"),
+                    props.getProperty(prefix + "reservedBy"),
                     parseDateTime(props.getProperty(prefix + "entryTime")),
                     parseDouble(props.getProperty(prefix + "hourlyRate"), 0.0)
             );
@@ -88,6 +89,7 @@ public class JsonParkingStateRepository implements ParkingStateRepository {
             props.setProperty(prefix + "ticketId", safe(rec.getTicketId()));
             props.setProperty(prefix + "vehicleType", safe(rec.getVehicleType()));
             props.setProperty(prefix + "licensePlate", safe(rec.getLicensePlate()));
+            props.setProperty(prefix + "reservedBy", safe(rec.getReservedBy()));
             props.setProperty(prefix + "entryTime", rec.getEntryTime() == null ? "" : rec.getEntryTime().toString());
             props.setProperty(prefix + "hourlyRate", String.valueOf(rec.getHourlyRate()));
             index++;
