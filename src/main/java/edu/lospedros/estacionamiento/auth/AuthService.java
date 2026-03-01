@@ -1,6 +1,7 @@
 package edu.lospedros.estacionamiento.auth;
 
 import edu.lospedros.estacionamiento.account.Account;
+import edu.lospedros.estacionamiento.account.Client;
 import edu.lospedros.estacionamiento.account.Guest;
 import edu.lospedros.estacionamiento.account.repository.AccountRepository;
 
@@ -33,5 +34,19 @@ public class AuthService {
         String id = "guest-" + UUID.randomUUID();
         Guest guest = new Guest(id, "guest@local");
         return new SessionContext(guest);
+    }
+
+    public boolean registerClient(String email, String password, Client.VehicleProfile vehicle) {
+        Client client = new Client(
+                "client-" + UUID.randomUUID(),
+                email,
+                passwordHasher.hash(password),
+                vehicle.getVehicleType(),
+                vehicle.getVehicleBrand(),
+                vehicle.getVehicleModel(),
+                vehicle.getVehicleColor(),
+                vehicle.getVehiclePlate()
+        );
+        return cuentaRepository.saveAccount(client);
     }
 }

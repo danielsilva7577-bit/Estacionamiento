@@ -1,27 +1,46 @@
 package edu.lospedros.estacionamiento.UI;
 
+import edu.lospedros.estacionamiento.account.Account;
+import edu.lospedros.estacionamiento.account.Client;
 import edu.lospedros.estacionamiento.languages.LanguageManager;
 import edu.lospedros.estacionamiento.auth.AuthService;
 import edu.lospedros.estacionamiento.auth.SessionContext;
+import edu.lospedros.estacionamiento.validation.PlateValidator;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.Cursor;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonBar;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.ChoiceDialog;
+import javafx.scene.control.Dialog;
+import javafx.scene.control.DialogPane;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
+import javafx.scene.control.TextInputDialog;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
+import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.function.Consumer;
 
 public class LoginView {
+    private static final String PRIMARY_ORANGE = "#ea580c";
+    private static final String PRIMARY_ORANGE_DARK = "#c2410c";
+    private static final String SOFT_ORANGE = "#fed7aa";
+    private static final String DIALOG_STYLE = "-fx-background-color: #fffaf5;";
+
     public void show(Stage stage, AuthService authService, Consumer<SessionContext> onAuthenticated) {
         BorderPane root = new BorderPane();
         root.setStyle("-fx-background-color: #fffaf5; -fx-font-family: 'Segoe UI';");
@@ -98,10 +117,18 @@ public class LoginView {
         btnGuest.setOnMouseExited(e -> btnGuest.setStyle(guestBase));
         btnGuest.setOnAction(e -> onAuthenticated.accept(authService.loginAsGuest()));
 
+        Button btnRegister = new Button(LanguageManager.get("login.btn.register"));
+        btnRegister.setStyle(guestBase);
+        btnRegister.setMinWidth(170);
+        btnRegister.setCursor(Cursor.HAND);
+        btnRegister.setOnMouseEntered(e -> btnRegister.setStyle(guestHover));
+        btnRegister.setOnMouseExited(e -> btnRegister.setStyle(guestBase));
+        btnRegister.setOnAction(e -> registerUser(stage, authService));
+
         HBox actions = new HBox(10, btnLogin, btnGuest);
         actions.setAlignment(Pos.CENTER_LEFT);
 
-        rightPanel.getChildren().addAll(title, subtitle, txtEmail, txtPassword, actions, error);
+        rightPanel.getChildren().addAll(title, subtitle, txtEmail, txtPassword, actions, btnRegister, error);
 
         root.setLeft(leftPanel);
         root.setCenter(rightPanel);
@@ -110,5 +137,157 @@ public class LoginView {
         stage.setTitle(LanguageManager.get("login.window.title"));
         stage.show();
         stage.centerOnScreen();
+    }
+
+    private void registerUser(Stage stage, AuthService authService) {
+        while (true) {
+            Optional<String> email = promptRequiredText(stage,
+                    LanguageManager.get("admin.users.email.prompt"),
+                    LanguageManager.get("error.validation.required")
+            );
+            if (email.isEmpty()) return;
+            String normalizedEmail = email.get().toLowerCase(Locale.ROOT);
+            if (!isValidEmail(normalizedEmail)) {
+                showError(stage, "error.validation.title", LanguageManager.get("error.validation.email"));
+                continue;
+            }
+
+            Optional<String> password = promptRequiredText(stage,
+                    LanguageManager.get("admin.users.password.prompt"),
+                    LanguageManager.get("error.validation.required")
+            );
+            if (password.isEmpty()) return;
+            if (!isValidPassword(password.get())) {
+                showError(stage, "error.validation.title", LanguageManager.get("error.validation.password"));
+                continue;
+            }
+
+            Optional<Client.VehicleProfile> vehicle = promptClientVehicleProfile(stage);
+            if (vehicle.isEmpty()) return;
+
+            if (authService.registerClient(normalizedEmail, password.get(), vehicle.get())) {
+                Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                alert.initOwner(stage);
+                alert.setTitle(LanguageManager.get("login.register.success.title"));
+                alert.setHeaderText(LanguageManager.get("login.register.success.header"));
+                alert.setContentText(LanguageManager.get("login.register.success.msg"));
+                styleDialog(alert.getDialogPane());
+                alert.showAndWait();
+                return;
+            } else {
+                showError(stage, "error.state.title", LanguageManager.get("admin.users.duplicate"));
+            }
+        }
+    }
+
+    private Optional<Client.VehicleProfile> promptClientVehicleProfile(Stage stage) {
+        ChoiceDialog<String> dialog = new ChoiceDialog<>("CARRO", List.of("CARRO", "MOTO", "CAMIONETA"));
+        dialog.initOwner(stage);
+        dialog.setTitle(LanguageManager.get("admin.users.vehicle.type.title"));
+        dialog.setHeaderText(LanguageManager.get("admin.users.vehicle.type.prompt"));
+        dialog.setContentText(LanguageManager.get("payment.method"));
+        styleDialog(dialog.getDialogPane());
+
+        Optional<String> typeSelected = dialog.showAndWait();
+        if (typeSelected.isEmpty()) return Optional.empty();
+
+        String vehicleType = switch (typeSelected.get()) {
+            case "CARRO" -> "CAR";
+            case "MOTO" -> "MOTORCYCLE";
+            case "CAMIONETA" -> "TRUCK";
+            default -> "CAR";
+        };
+
+        Optional<String> brand = promptRequiredText(stage,
+                LanguageManager.get("admin.users.vehicle.brand.prompt"),
+                LanguageManager.get("error.validation.required")
+        );
+        if (brand.isEmpty()) return Optional.empty();
+
+        Optional<String> model = promptRequiredText(stage,
+                LanguageManager.get("admin.users.vehicle.model.prompt"),
+                LanguageManager.get("error.validation.required")
+        );
+        if (model.isEmpty()) return Optional.empty();
+
+        Optional<String> color = promptRequiredText(stage,
+                LanguageManager.get("admin.users.vehicle.color.prompt"),
+                LanguageManager.get("error.validation.required")
+        );
+        if (color.isEmpty()) return Optional.empty();
+
+        String plate;
+        while (true) {
+            Optional<String> plateText = promptRequiredText(stage,
+                    LanguageManager.get("admin.users.vehicle.plate.prompt"),
+                    LanguageManager.get("error.validation.required")
+            );
+            if (plateText.isEmpty()) return Optional.empty();
+            plate = PlateValidator.normalize(plateText.get());
+            if (!PlateValidator.hasValidLength(plate)) {
+                showError(stage, "error.validation.title", LanguageManager.get("error.plate.length"));
+                continue;
+            }
+            if (!PlateValidator.hasValidFormat(plate)) {
+                showError(stage, "error.validation.title", LanguageManager.get("error.plate.format"));
+                continue;
+            }
+            break;
+        }
+
+        return Optional.of(new Client.VehicleProfile(
+                vehicleType,
+                brand.get(),
+                model.get(),
+                color.get(),
+                plate
+        ));
+    }
+
+    private Optional<String> promptRequiredText(Stage stage, String prompt, String missingMessage) {
+        while (true) {
+            TextInputDialog dialog = new TextInputDialog();
+            dialog.initOwner(stage);
+            dialog.setTitle(LanguageManager.get("payment.title"));
+            dialog.setHeaderText(LanguageManager.get("dialog.input.header"));
+            dialog.setContentText(prompt);
+            styleDialog(dialog.getDialogPane());
+            Optional<String> result = dialog.showAndWait();
+            if (result.isEmpty()) return Optional.empty();
+            String value = result.get().trim();
+            if (!value.isEmpty()) return Optional.of(value);
+            showError(stage, "error.validation.title", missingMessage);
+        }
+    }
+
+    private void showError(Stage stage, String titleKey, String message) {
+        Alert error = new Alert(Alert.AlertType.ERROR);
+        error.initOwner(stage);
+        error.setTitle(LanguageManager.get(titleKey));
+        error.setHeaderText(LanguageManager.get("dialog.error.header"));
+        error.setContentText(message);
+        styleDialog(error.getDialogPane());
+        error.showAndWait();
+    }
+
+    private void styleDialog(DialogPane pane) {
+        pane.setStyle(DIALOG_STYLE + " -fx-border-color: " + SOFT_ORANGE + ";");
+        for (Button button : pane.lookupAll(".button").stream().filter(n -> n instanceof Button).map(n -> (Button) n).toList()) {
+            String base = "-fx-background-color: " + PRIMARY_ORANGE + "; -fx-text-fill: white; -fx-border-width: 0;";
+            String hover = "-fx-background-color: " + PRIMARY_ORANGE_DARK + "; -fx-text-fill: white; -fx-border-width: 0;";
+            button.setStyle(base);
+            button.setCursor(Cursor.HAND);
+            button.setOnMouseEntered(e -> button.setStyle(hover));
+            button.setOnMouseExited(e -> button.setStyle(base));
+        }
+    }
+
+    private boolean isValidEmail(String email) {
+        if (email == null || email.isBlank()) return false;
+        return email.matches("^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$");
+    }
+
+    private boolean isValidPassword(String password) {
+        return password != null && password.length() >= 8;
     }
 }

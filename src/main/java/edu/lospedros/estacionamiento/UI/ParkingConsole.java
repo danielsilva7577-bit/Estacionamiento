@@ -10,6 +10,7 @@ import edu.lospedros.estacionamiento.account.Administrator;
 import edu.lospedros.estacionamiento.account.Client;
 import edu.lospedros.estacionamiento.account.Account;
 import edu.lospedros.estacionamiento.account.repository.AccountRepository;
+import edu.lospedros.estacionamiento.auth.AuthService;
 import edu.lospedros.estacionamiento.auth.PasswordHasher;
 import edu.lospedros.estacionamiento.auth.SessionContext;
 import edu.lospedros.estacionamiento.data.Motorcycle;
@@ -171,6 +172,7 @@ public class ParkingConsole {
     private Client.VehicleProfile selectedClientVehicle;
     private VehicleCategory selectedCategory = VehicleCategory.CAR;
     private boolean adminViewActive;
+    private Ticket currentGuestTicket;
 
     public ParkingConsole(SessionContext session, AccountRepository cuentaRepository, PasswordHasher passwordHasher) {
         this.session = session;
@@ -300,7 +302,20 @@ public class ParkingConsole {
         });
         lang.getChildren().addAll(btnEs, btnEn);
 
-        sidebar.getChildren().addAll(appLabel, userInfo, new Separator(), navTitle, nav, clientSection, adminSection, spacer, lang);
+        Button btnLogout = new Button(LanguageManager.get("btn.logout"));
+        btnLogout.setMaxWidth(Double.MAX_VALUE);
+        btnLogout.setStyle(SIDEBAR_BUTTON_STYLE);
+        applyHover(btnLogout, SIDEBAR_BUTTON_STYLE, SIDEBAR_BUTTON_HOVER_STYLE);
+        btnLogout.setOnAction(e -> {
+            AuthService authService = new AuthService(cuentaRepository, passwordHasher);
+            LoginView loginView = new LoginView();
+            loginView.show(stage, authService, session -> {
+                ParkingConsole parkingConsole = new ParkingConsole(session, cuentaRepository, passwordHasher);
+                parkingConsole.show(stage);
+            });
+        });
+
+        sidebar.getChildren().addAll(appLabel, userInfo, new Separator(), navTitle, nav, clientSection, adminSection, spacer, lang, new Separator(), btnLogout);
         return sidebar;
     }
 
@@ -586,8 +601,35 @@ public class ParkingConsole {
         btnAction.setStyle(ACTION_REGISTER_STYLE);
         applyHover(btnAction, ACTION_REGISTER_STYLE, ACTION_REGISTER_HOVER_STYLE);
 
-        if (activeTickets.containsKey(spaceId)) {
+        boolean isOccupied = activeTickets.containsKey(spaceId);
+        if (isOccupied) {
             markAsOccupied(card, lblStatus, btnAction);
+        }
+
+        if (!session.isAdmin()) {
+            boolean hasTicket = hasActiveTicket();
+            String disabledStyle = "-fx-background-color: #e5e7eb; -fx-text-fill: #9ca3af; -fx-font-size: 12px; -fx-font-weight: 600; -fx-border-width: 0;";
+
+            if (isOccupied) {
+                boolean isMine = false;
+                if (hasTicket) {
+                    Ticket t = activeTickets.get(spaceId);
+                    isMine = isTicketOwnedByCurrentUser(t);
+                }
+                if (!isMine) {
+                    btnAction.setDisable(true);
+                    btnAction.setStyle(disabledStyle);
+                    btnAction.setOnMouseEntered(null);
+                    btnAction.setOnMouseExited(null);
+                }
+            } else {
+                if (hasTicket) {
+                    btnAction.setDisable(true);
+                    btnAction.setStyle(disabledStyle);
+                    btnAction.setOnMouseEntered(null);
+                    btnAction.setOnMouseExited(null);
+                }
+            }
         }
 
         btnAction.setOnAction(e -> {
@@ -682,6 +724,9 @@ public class ParkingConsole {
         }
 
         activeTickets.put(spaceId, ticket);
+        if (session.isGuest()) {
+            currentGuestTicket = ticket;
+        }
         if (pendingVehicleNote != null && !pendingVehicleNote.isBlank()) {
             ticketVehicleNotes.put(ticket.getId(), pendingVehicleNote);
             pendingVehicleNote = null;
@@ -724,6 +769,9 @@ public class ParkingConsole {
         ));
 
         activeTickets.remove(spaceId);
+        if (session.isGuest() && currentGuestTicket != null && currentGuestTicket.getId().equals(ticket.getId())) {
+            currentGuestTicket = null;
+        }
         releaseSpace(card, lblStatus, btnAction);
         persistState();
         refreshMainContent();
@@ -1296,7 +1344,7 @@ public class ParkingConsole {
         return switch (normalized) {
             case "CAR", "PROMEDIO" -> Optional.of(VehicleCategory.CAR);
             case "MOTORCYCLE", "MOTO" -> Optional.of(VehicleCategory.MOTORCYCLE);
-            case "TRUCK", "GRANDE" -> Optional.of(VehicleCategory.TRUCK);
+            case "TRUCK", "CAMIONETA" -> Optional.of(VehicleCategory.TRUCK);
             default -> Optional.empty();
         };
     }
@@ -1399,5 +1447,39 @@ public class ParkingConsole {
         styleDialog(dialog.getDialogPane());
         Optional<String> result = dialog.showAndWait();
         return result.isPresent() && yes.equalsIgnoreCase(result.get());
+    }
+
+    private boolean hasActiveTicket() {
+        if (session.isGuest()) {
+            return currentGuestTicket != null;
+        }
+        return isClientWithActiveTicket();
+    }
+
+    private boolean isTicketOwnedByCurrentUser(Ticket ticket) {
+        if (session.isGuest()) {
+            return currentGuestTicket != null && currentGuestTicket.getId().equals(ticket.getId());
+        }
+        return isTicketOwnedByClient(ticket);
+    }
+
+    private boolean isClientWithActiveTicket() {
+        if (session.getCurrentAccount() instanceof Client) {
+            for (Ticket ticket : activeTickets.values()) {
+                if (isTicketOwnedByClient(ticket)) return true;
+            }
+        }
+        return false;
+    }
+
+    private boolean isTicketOwnedByClient(Ticket ticket) {
+        if (session.getCurrentAccount() instanceof Client cliente) {
+            Vehicle v = ticket.getVehiculo();
+            if (v == null || v.getPlaca() == null) return false;
+            String tPlate = PlateValidator.normalize(v.getPlaca());
+            return cliente.getVehicles().stream()
+                    .anyMatch(vp -> PlateValidator.normalize(vp.getVehiclePlate()).equals(tPlate));
+        }
+        return false;
     }
 }
