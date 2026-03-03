@@ -1,87 +1,62 @@
 package edu.lospedros.estacionamiento.UI;
 
-import javafx.geometry.Insets;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
-import javafx.scene.control.Dialog;
 import javafx.scene.control.DialogPane;
-import javafx.scene.control.Label;
-import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import javafx.scene.Cursor;
 
 import java.util.Optional;
 
-public final class UiMessageDialog {
-    private static final String BG = "#fffaf5";
-    private static final String BORDER = "#fed7aa";
-    private static final String PRIMARY = "#ea580c";
-    private static final String PRIMARY_DARK = "#c2410c";
-    private static final String TEXT = "#7c2d12";
-    private static final String MUTED = "#9a3412";
+public class UiMessageDialog {
+    private static final String PRIMARY_ORANGE = "#ea580c";
+    private static final String PRIMARY_ORANGE_DARK = "#c2410c";
+    private static final String SOFT_ORANGE = "#fed7aa";
+    private static final String DIALOG_STYLE = "-fx-background-color: #fffaf5; -fx-background-radius: 0; -fx-border-radius: 0;";
 
-    private UiMessageDialog() {
+    public static void info(Stage owner, String title, String header, String content) {
+        show(owner, Alert.AlertType.INFORMATION, title, header, content);
     }
 
-    public static void info(Stage owner, String title, String header, String message) {
-        Dialog<ButtonType> dialog = build(owner, title, header, message);
-        dialog.getDialogPane().getButtonTypes().add(ButtonType.OK);
-        styleButtons(dialog.getDialogPane());
-        dialog.showAndWait();
+    public static void error(Stage owner, String title, String header, String content) {
+        show(owner, Alert.AlertType.ERROR, title, header, content);
     }
 
-    public static void warning(Stage owner, String title, String header, String message) {
-        Dialog<ButtonType> dialog = build(owner, title, header, message);
-        dialog.getDialogPane().getButtonTypes().add(ButtonType.OK);
-        styleButtons(dialog.getDialogPane());
-        dialog.showAndWait();
+    public static void warning(Stage owner, String title, String header, String content) {
+        show(owner, Alert.AlertType.WARNING, title, header, content);
     }
 
-    public static void error(Stage owner, String title, String header, String message) {
-        Dialog<ButtonType> dialog = build(owner, title, header, message);
-        dialog.getDialogPane().getButtonTypes().add(ButtonType.OK);
-        styleButtons(dialog.getDialogPane());
-        dialog.showAndWait();
-    }
-
-    public static boolean confirm(Stage owner, String title, String header, String message) {
-        Dialog<ButtonType> dialog = build(owner, title, header, message);
-        dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
-        styleButtons(dialog.getDialogPane());
-        Optional<ButtonType> result = dialog.showAndWait();
+    public static boolean confirm(Stage owner, String title, String header, String content) {
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.initOwner(owner);
+        alert.setTitle(title);
+        alert.setHeaderText(header);
+        alert.setContentText(content);
+        styleDialog(alert.getDialogPane());
+        Optional<ButtonType> result = alert.showAndWait();
         return result.isPresent() && result.get() == ButtonType.OK;
     }
 
-    private static Dialog<ButtonType> build(Stage owner, String title, String header, String message) {
-        Dialog<ButtonType> dialog = new Dialog<>();
-        dialog.initOwner(owner);
-        dialog.setTitle(title == null ? "" : title);
-
-        Label headerLabel = new Label(header == null ? "" : header);
-        headerLabel.setWrapText(true);
-        headerLabel.setStyle("-fx-font-size: 14px; -fx-font-weight: 800; -fx-text-fill: " + TEXT + ";");
-
-        Label messageLabel = new Label(message == null ? "" : message);
-        messageLabel.setWrapText(true);
-        messageLabel.setStyle("-fx-font-size: 12px; -fx-font-weight: 500; -fx-text-fill: " + MUTED + ";");
-
-        VBox content = new VBox(8, headerLabel, messageLabel);
-        content.setPadding(new Insets(12));
-        content.setStyle("-fx-background-color: " + BG + "; -fx-background-radius: 0;");
-
-        DialogPane pane = dialog.getDialogPane();
-        pane.setContent(content);
-        pane.setStyle("-fx-background-color: " + BG + "; -fx-border-color: " + BORDER + "; -fx-background-radius: 0; -fx-border-radius: 0;");
-        return dialog;
+    private static void show(Stage owner, Alert.AlertType type, String title, String header, String content) {
+        Alert alert = new Alert(type);
+        alert.initOwner(owner);
+        alert.setTitle(title);
+        alert.setHeaderText(header);
+        alert.setContentText(content);
+        styleDialog(alert.getDialogPane());
+        alert.showAndWait();
     }
 
-    private static void styleButtons(DialogPane pane) {
+    private static void styleDialog(DialogPane pane) {
+        pane.setStyle(DIALOG_STYLE + " -fx-border-color: " + SOFT_ORANGE + ";");
         for (Button button : pane.lookupAll(".button").stream().filter(n -> n instanceof Button).map(n -> (Button) n).toList()) {
-            String base = "-fx-background-color: " + PRIMARY + "; -fx-text-fill: white; -fx-border-width: 0; -fx-background-radius: 0; -fx-border-radius: 0;";
-            String hover = "-fx-background-color: " + PRIMARY_DARK + "; -fx-text-fill: white; -fx-border-width: 0; -fx-background-radius: 0; -fx-border-radius: 0;";
+            String base = "-fx-background-color: " + PRIMARY_ORANGE + "; -fx-text-fill: white; -fx-border-width: 0; -fx-background-radius: 0; -fx-border-radius: 0;";
+            String hover = "-fx-background-color: " + PRIMARY_ORANGE_DARK + "; -fx-text-fill: white; -fx-border-width: 0; -fx-background-radius: 0; -fx-border-radius: 0;";
             button.setStyle(base);
+            button.setCursor(Cursor.HAND);
             button.setOnMouseEntered(e -> button.setStyle(hover));
             button.setOnMouseExited(e -> button.setStyle(base));
         }
     }
 }
-

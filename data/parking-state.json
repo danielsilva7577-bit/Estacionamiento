@@ -1,5 +1,5 @@
 #Parking state
-#Sun Mar 01 14:13:57 CST 2026
+#Tue Mar 03 11:59:49 CST 2026
 active.count=0
 exit.0.entryTime=2026-02-28T01\:15\:41.437388600
 exit.0.exitTime=2026-02-28T01\:15\:52.363884200
@@ -217,6 +217,14 @@ exit.32.spaceId=70
 exit.32.ticketId=TKT-1
 exit.32.totalPaid=30.00
 exit.32.vehicleType=PROMEDIO
+exit.33.entryTime=2026-03-03T11\:58\:44.416096
+exit.33.exitTime=2026-03-03T11\:59\:49.728762
+exit.33.licensePlate=ASDFGBV
+exit.33.paymentMethod=EFECTIVO
+exit.33.spaceId=51
+exit.33.ticketId=TKT-1
+exit.33.totalPaid=30.00
+exit.33.vehicleType=PROMEDIO
 exit.4.entryTime=2026-02-28T10\:03\:54.018315500
 exit.4.exitTime=2026-02-28T10\:04\:01.887803300
 exit.4.licensePlate=1234567
@@ -265,4 +273,4 @@ exit.9.spaceId=51
 exit.9.ticketId=TKT-1
 exit.9.totalPaid=30.00
 exit.9.vehicleType=PROMEDIO
-exit.count=33
+exit.count=34

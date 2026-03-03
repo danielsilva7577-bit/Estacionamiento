@@ -10,6 +10,7 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.Cursor;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
@@ -46,6 +47,8 @@ public class LoginView {
     private static final String PRIMARY_ORANGE_DARK = "#c2410c";
     private static final String SOFT_ORANGE = "#fed7aa";
     private static final String DIALOG_STYLE = "-fx-background-color: #fffaf5; -fx-background-radius: 0; -fx-border-radius: 0;";
+    private static final String TEXT_DARK = "#7c2d12";
+    private static final String ORANGE_LIGHT = "#fed7aa";
 
     /**
      * Muestra la pantalla de inicio de sesión.
@@ -74,17 +77,34 @@ public class LoginView {
         Region leftSpacer = new Region();
         VBox.setVgrow(leftSpacer, Priority.ALWAYS);
 
-        Label demos1 = new Label(LanguageManager.get("login.demo.admin"));
-        demos1.setStyle("-fx-font-size: 11px; -fx-text-fill: #9a3412;");
-        Label demos2 = new Label(LanguageManager.get("login.demo.client"));
-        demos2.setStyle("-fx-font-size: 11px; -fx-text-fill: #9a3412;");
-
-        leftPanel.getChildren().addAll(systemName, engine, leftSpacer, demos1, demos2);
+        leftPanel.getChildren().addAll(systemName, engine, leftSpacer);
 
         VBox rightPanel = new VBox(14);
         rightPanel.setPadding(new Insets(42));
         rightPanel.setAlignment(Pos.CENTER_LEFT);
         rightPanel.setStyle("-fx-background-color: #ffffff; -fx-background-radius: 0; -fx-border-radius: 0;");
+
+        HBox topBar = new HBox();
+        topBar.setAlignment(Pos.TOP_RIGHT);
+        HBox langBox = new HBox(8);
+        Button btnEs = new Button("ES");
+        Button btnEn = new Button("EN");
+        String langBase = "-fx-background-color: #fff7ed; -fx-text-fill: " + TEXT_DARK + "; -fx-border-width: 0; -fx-background-radius: 0; -fx-border-radius: 0;";
+        String langHover = "-fx-background-color: " + ORANGE_LIGHT + "; -fx-text-fill: " + PRIMARY_ORANGE_DARK + "; -fx-border-width: 0; -fx-background-radius: 0; -fx-border-radius: 0;";
+        btnEs.setStyle(langBase);
+        btnEn.setStyle(langBase);
+        applyHover(btnEs, langBase, langHover);
+        applyHover(btnEn, langBase, langHover);
+        btnEs.setOnAction(e -> {
+            LanguageManager.setLocale("es");
+            show(stage, authService, onAuthenticated);
+        });
+        btnEn.setOnAction(e -> {
+            LanguageManager.setLocale("en");
+            show(stage, authService, onAuthenticated);
+        });
+        langBox.getChildren().addAll(btnEs, btnEn);
+        topBar.getChildren().add(langBox);
 
         Label title = new Label(LanguageManager.get("login.title"));
         title.setStyle("-fx-font-size: 22px; -fx-font-weight: 800; -fx-text-fill: #9a3412;");
@@ -154,6 +174,7 @@ public class LoginView {
         VBox.setVgrow(actionSpacer, Priority.ALWAYS);
 
         rightPanel.getChildren().addAll(
+                topBar,
                 title,
                 subtitle,
                 lblEmail,
@@ -313,6 +334,13 @@ public class LoginView {
             button.setOnMouseEntered(e -> button.setStyle(hover));
             button.setOnMouseExited(e -> button.setStyle(base));
         }
+    }
+
+    private void applyHover(Button button, String baseStyle, String hoverStyle) {
+        button.setStyle(baseStyle);
+        button.setCursor(Cursor.HAND);
+        button.setOnMouseEntered(e -> button.setStyle(hoverStyle));
+        button.setOnMouseExited(e -> button.setStyle(baseStyle));
     }
 
     private boolean isValidEmail(String email) {
